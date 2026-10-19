@@ -68,12 +68,17 @@ h1,h2,h3{font-family:'Cinzel',serif;font-weight:400}
 .menu-sec h3{font-size:28px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
 .rule{width:120px;height:1px;background:var(--gold);margin:12px 0 24px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
-.card{background:var(--cream);color:var(--ink);padding:22px 24px;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--cream);color:var(--ink);padding:22px 24px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
 .card h4{font-size:17px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#1f2219}
 .card .desc{color:#43463a;font-size:15px}
 .card .hint{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#5b5e4f}
+.foto{display:block;width:calc(100% + 48px);max-width:none;margin:-22px -24px 6px;aspect-ratio:4/3;object-fit:cover;background:#1d2018}
 .opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:8px}
 .opt{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;background:var(--bg);color:var(--gold2);font-weight:600;font-size:14px;letter-spacing:.08em}
+
+/* Galería */
+.galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:12px}
+.galeria img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#1d2018;border:1px solid var(--line)}
 
 /* Footer */
 footer{margin-top:72px;border-top:1px solid var(--line);background:var(--bg2)}
@@ -143,6 +148,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold2);outline-offs
     <nav id="chips" class="chips" aria-label="Categorías del menú"></nav>
   </div>
   <div id="menu-list"></div>
+  <section id="galeria" class="menu-sec">
+    <h3>Más de nuestra cocina</h3>
+    <div class="rule"></div>
+    <div id="galeria-list" class="galeria"></div>
+  </section>
 </main>
 
 <footer>
@@ -170,6 +180,25 @@ var CONFIG = {
   direccion: '[DIRECCIÓN]',
   horario:   '[HORARIO]'
 };
+
+/* FOTOS (DEMO): qué foto lleva cada platillo.
+   Las fotos van en la carpeta "img" junto a este archivo.
+   Para cambiar una foto, cambia el nombre del archivo.
+   Para quitar la foto de un platillo, borra esa línea. */
+var FOTOS = {
+  'Tostada Atún Roca': 'img/foto-04.jpg',
+  'Cordon Blue':       'img/foto-07.jpg',
+  'Guamúchilito':      'img/foto-10.jpg',
+  'Akai':              'img/foto-12.jpg',
+  'Koban':             'img/foto-01.jpg',
+  'Kintsugi':          'img/foto-11.jpg',
+  'TDHA':              'img/foto-02.jpg',
+  'Enko':              'img/foto-03.jpg',
+  'Gohan':             'img/foto-08.jpg'
+};
+
+/* Fotos extra que van en "Más de nuestra cocina". */
+var GALERIA = ['img/foto-05.jpg', 'img/foto-06.jpg', 'img/foto-09.jpg', 'img/foto-13.jpg'];
 
 /* Premios de la ruleta.
    l1 y l2 son las dos líneas que se ven en la ruleta.
@@ -257,12 +286,24 @@ var MENU = [
         var aria = 'Pedir ' + what + ' por WhatsApp, $' + o[1];
         return '<a class="opt" href="' + wa('Hola, quiero pedir: ' + what + ' - $' + o[1]) + '" target="_blank" rel="noopener" aria-label="' + esc(aria) + '">' + ICON_WA + '<span>' + esc(text) + '</span></a>';
       }).join('');
-      return '<article class="card"><h4>' + esc(name) + '</h4><p class="desc">' + esc(desc) + '</p>' +
+      var foto = FOTOS[name]
+        ? '<img class="foto" src="' + esc(FOTOS[name]) + '" alt="' + esc(name) + '" loading="lazy" onerror="this.remove()">'
+        : '';
+      return '<article class="card">' + foto + '<h4>' + esc(name) + '</h4><p class="desc">' + esc(desc) + '</p>' +
         (multi ? '<p class="hint">Elige tu proteína</p>' : '') +
         '<div class="opts">' + buttons + '</div></article>';
     }).join('');
     return '<section id="' + sec.id + '" class="menu-sec"><h3>' + esc(sec.title) + '</h3><div class="rule"></div><div class="grid">' + cards + '</div></section>';
   }).join('');
+
+  /* Galería */
+  if (GALERIA.length) {
+    document.getElementById('galeria-list').innerHTML = GALERIA.map(function (src) {
+      return '<img src="' + esc(src) + '" alt="Platillo de Kintsugi Sushi" loading="lazy" onerror="this.remove()">';
+    }).join('');
+  } else {
+    document.getElementById('galeria').hidden = true;
+  }
 
   /* Compartir y redes */
   var shareText = 'Gira la ruleta de Kintsugi Sushi y gana premios' + (CONFIG.siteUrl ? ': ' + CONFIG.siteUrl : '');
